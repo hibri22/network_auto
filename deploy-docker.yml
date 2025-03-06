@@ -1,0 +1,24 @@
+---
+- name: Deploy Docker Container
+  hosts: azure_vm
+  become: true
+  tasks:
+
+    - name: Copy application files to VM
+      copy:
+        src: ./docker-app/
+        dest: /home/azureuser/docker-app/
+
+    - name: Build Docker image
+      command: docker build -t my-web-app /home/azureuser/docker-app/
+
+    - name: Stop existing container (if running)
+      command: docker stop web-app
+      ignore_errors: yes
+
+    - name: Remove existing container (if exists)
+      command: docker rm web-app
+      ignore_errors: yes
+
+    - name: Run Docker container
+      command: docker run -d -p 80:80 --name web-app my-web-app

@@ -1,0 +1,42 @@
+---
+- name: Set up Docker on EC2 instance
+  hosts: all  # Apply to all hosts in inventory file (could be specific group or IP)
+  become: yes  # Run tasks with sudo privileges
+
+  tasks:
+    # 1. Update apt cache and install prerequisites
+    - name: Update apt and install dependencies
+      apt:
+        update_cache: yes
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+        state: present
+
+    # 2. Add Docker's official GPG key
+    - name: Add Docker’s official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    # 3. Set up the Docker repository
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        state: present
+
+    # 4. Install Docker
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    # 5. Ensure Docker is started and enabled at boot time
+    - name: Ensure Docker is started and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes

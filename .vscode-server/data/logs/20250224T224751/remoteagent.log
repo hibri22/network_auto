@@ -1,0 +1,13 @@
+2025-02-24 22:47:51.305 [info] 
+
+
+
+
+2025-02-24 22:47:51.305 [info] Extension host agent started.
+2025-02-24 22:47:51.316 [info] Started initializing default profile extensions in extensions installation folder. file:///home/kali/.vscode-server/extensions
+2025-02-24 22:47:51.326 [info] Completed initializing default profile extensions in extensions installation folder. file:///home/kali/.vscode-server/extensions
+2025-02-24 22:47:51.413 [info] [127.0.0.1][1adbabac][ManagementConnection] New connection established.
+2025-02-24 22:47:51.641 [info] [127.0.0.1][befed5dd][ExtensionHostConnection] New connection established.
+2025-02-24 22:47:51.646 [info] [127.0.0.1][befed5dd][ExtensionHostConnection] <890> Launched Extension Host Process.
+2025-02-24 22:48:08.895 [info] [127.0.0.1][1adbabac][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+2025-02-24 22:48:08.923 [info] [127.0.0.1][befed5dd][ExtensionHostConnection] <890> Extension Host Process exited with code: 0, signal: null.
