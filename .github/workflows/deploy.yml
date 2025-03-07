@@ -1,47 +1,97 @@
-name: Deploy to Azure VM
+trigger:
+  - main
 
-on:
-  push:
-    branches:
-      - main  # Runs when code is pushed to 'main'
+pool:
+  vmImage: 'ubuntu-latest'
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+- job: Setup
+  displayName: "Setup Environment"
+  steps:
+    - checkout: self
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - task: Bash@3
+      displayName: "Install Terraform"
+      inputs:
+        targetType: "inline"
+        script: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+          unzip terraform_1.4.6_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
 
-    - name: Install sshpass
-      run: sudo apt-get update && sudo apt-get install -y sshpass
+    - task: Bash@3
+      displayName: "Install Ansible & Dependencies"
+      inputs:
+        targetType: "inline"
+        script: |
+          sudo apt update
+          sudo apt install -y ansible sshpass
 
-    - name: Verify SSH Connection
-      run: |
-        echo "Verifying SSH connection..."
-        sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" ssh -o StrictHostKeyChecking=no -o BatchMode=yes ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }} "echo SSH Connection Successful"
-      continue-on-error: false  # Fail the job if SSH fails
+- job: Terraform
+  displayName: "Run Terraform"
+  dependsOn: Setup
+  steps:
+    - checkout: self
 
-    - name: Create target directory on VM (if not exists)
-      run: |
-        sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }} "mkdir -p /home/${{ secrets.AZURE_VM_USERNAME }}/app"
+    - script: |
+        terraform init
+        terraform apply -auto-approve
+      displayName: "Terraform Apply"
 
-    - name: Deploy files to VM
-      run: |
-        sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" scp -o StrictHostKeyChecking=no -r * ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }}:/home/${{ secrets.AZURE_VM_USERNAME }}/app/
+- job: ConfigureVM
+  displayName: "Configure Azure VM with Ansible"
+  dependsOn: Terraform
+  steps:
+    - checkout: self
 
-    - name: Deploy Docker Container on VM
-      run: |
-        sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }} << 'EOF'
-        # Ensure Docker is installed
-        sudo apt update && sudo apt install -y docker.io
+    - task: Bash@3
+      displayName: "Setup SSH Keys"
+      inputs:
+        targetType: "inline"
+        script: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
-        # Stop and remove old container if running
-        docker stop web-app || true
-        docker rm web-app || true
+    - script: |
+        ansible-playbook -i inventory.ini install_docker.yml
+      displayName: "Run Ansible Playbook to Install Docker"
 
-        # Remove old images to free up space (optional)
-        docker rmi my-web-app:latest || true
+- job: BuildAndPushDocker
+  displayName: "Build and Push Docker Image"
+  dependsOn: ConfigureVM
+  steps:
+    - checkout: self
+
+    - script: |
+        sudo apt update
+        sudo apt install -y docker.io
+      displayName: "Install Docker"
+
+    - task: Docker@2
+      displayName: "Build and Push Docker Image"
+      inputs:
+        containerRegistry: "$(dockerRegistryServiceConnection)"
+        repository: "my-web-app"
+        command: "buildAndPush"
+        Dockerfile: "./Dockerfile"
+        tags: |
+          $(Build.BuildId)
+
+- job: Deploy
+  displayName: "Deploy Docker Container on Azure VM"
+  dependsOn: BuildAndPushDocker
+  steps:
+    - checkout: self
+
+    - script: |
+        sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }} "
+        docker pull $(dockerRegistryServiceConnection)/my-web-app:$(Build.BuildId) &&
+        docker run -d -p 80:80 --name web-app $(dockerRegistryServiceConnection)/my-web-app:$(Build.BuildId)"
+      displayName: "Deploy Docker Container on VM"
+
 
         # Navigate to project directory
         cd /home/${{ secrets.AZURE_VM_USERNAME }}/app/
