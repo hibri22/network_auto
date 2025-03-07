@@ -26,19 +26,6 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-  terraform:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-
-      - name: Initialize Terraform
-        run: terraform init
-
-      - name: Apply Terraform Configuration
-        run: terraform apply -auto-approve
-
   configure-vm:
     runs-on: ubuntu-latest
     needs: terraform
