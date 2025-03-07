@@ -76,4 +76,4 @@ jobs:
 
       - name: Deploy Docker container to VM
         run: |
-          sshpass -p "${{ secrets.iY7)rz[& }}" ssh -o StrictHostKeyChecking=no ${{ secrets.20056980@mydbs.ie }}@${{ secrets.172.190.167.152 }} "docker pull my-web-app && docker run -d -p 80:80 --name web-app my-web-app"
+          sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }} "docker pull my-web-app && docker run -d -p 80:80 --name web-app my-web-app"
