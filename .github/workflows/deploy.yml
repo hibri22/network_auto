@@ -13,20 +13,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up SSH Key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.VM_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.AZURE_VM_PUBLIC_IP }} >> ~/.ssh/known_hosts
+    - name: Install sshpass
+      run: sudo apt-get update && sudo apt-get install -y sshpass
 
     - name: Deploy files to VM
       run: |
-        scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r ./* ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }}:/home/${{ secrets.AZURE_VM_USERNAME }}/app/
+        sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }}:/home/${{ secrets.AZURE_VM_USERNAME }}/app/
 
     - name: Deploy Docker Container on VM
       run: |
-        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }} << 'EOF'
+        sshpass -p "${{ secrets.AZURE_VM_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_VM_USERNAME }}@${{ secrets.AZURE_VM_PUBLIC_IP }} << 'EOF'
         # Ensure Docker is installed
         sudo apt update && sudo apt install -y docker.io
 
@@ -44,3 +40,4 @@ jobs:
         docker build -t my-web-app:latest .
         docker run -d -p 80:80 --name web-app my-web-app:latest
         EOF
+
