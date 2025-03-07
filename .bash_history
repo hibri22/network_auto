@@ -320,4 +320,142 @@ cat deploy-docker.yml
 cat inventory.ini
 ansible-playbook -i inventory.ini deploy-docker.yml
 vim main.tf
-                                    
+                                    mkdir -p .github/workflows
+nano .github/workflows/deploy.yml
+git init
+git add .
+git commit -m "Added GitHub Actions CI/CD"
+git push origin main
+sudo git add .
+git commit -m "Added GitHub Actions CI/CD"
+git push origin main
+git
+sudo apt install git
+git add .
+git commit -m "Added GitHub Actions CI/CD"
+git push origin main
+git add .
+git commit -m "Added GitHub Actions CI/CD"
+git config --global user.name "hibri22"
+git config --global user.name "josemon"
+git init
+git branch -M main
+git remote add origin https://github.com/hibri22/network_auto.git
+git push -u origin main
+git config --global user.name "hibri22"
+git init
+git branch -M main
+git remote add origin https://github.com/hibri22/network_auto.git
+git push -u origin main
+git branch
+git checkout -b main
+git add .
+git commit -m "Initial commit"
+git push -u origin main
+git remote set-url origin git@github.com:hibri22/network_auto.git
+git remote -v
+git push -u origin main
+git remote set-url origin git@github.com:hibri22/network_auto.git
+git push -u origin main
+git add .
+git init
+git add .
+git remote -v
+git remote set-url origin git@github.com:hibri22/network_auto.git
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/hibri22/network_auto.git
+
+b
+
+mkdir -p .github/workflows
+touch .github/workflows/ci-cd.yml
+mkdir -p .github/workflows
+touch .github/workflows/ci-cd.yml
+ls
+mkdir -p .github/workflows
+ls
+mkdir .github
+cd .github
+ls
+cd workflows/
+touch .github/workflows/ci-cd.yml
+touch .ci-cd.yml
+touch ci-cd.yml
+vim
+ls
+cd .github
+cd workflows/
+vim ci-cd.yml
+grep playbook.yml
+ls
+cd docker-app/
+ls
+../
+..\
+cd--
+--cd
+ls
+cat deploy-docker.yml 
+cat install_docker.yml 
+terraform destroy
+terraform init
+terraform plan
+terraform apply
+terraform destroy
+ls
+cd terraforms/
+terraform init
+terraform plan
+az login
+az account list --output table
+terraform init
+terraform plan
+az account set --subscription 1c9513f1-b41d-4239-906e-cf9afd7f7574
+rm -rf .terraform
+terraform init
+terraform plan
+rm -rf .terraform
+terraform init
+terraform plan
+env | grep ARM
+export ARM_SUBSCRIPTION_ID=1c9513f1-b41d-4239-906e-cf9afd7f7574
+terraform plan
+ls
+cd terraforms/
+ls
+terraform init
+terraform plan
+ls
+cd terraformaure-main/
+ls
+terraform init
+terraform plan
+terraform apply
+git init
+https://github.com/hibri22/newrep.git
+git remote add origin
+ls
+cat inventory.ini 
+cat deploy-docker.yml 
+docker build -t my-web-app .
+ansible -i inventory.ini azure_vm -m ping
+vim inventory.ini 
+ansible -i inventory.ini azure_vm -m ping
+ssh -i ~/.ssh/id_rsa azureuser@172.190.167.152
+ansible -i inventory.ini azure_vm -m ping
+docker build -t my-web-app .
+docker run -d -p 80:80 --name web-app my-web-app
+ls
+nano index.html
+docker build -t my-web-app .
+docker run -d -p 80:80 --name web-app my-web-app
+mkdir ~/docker-app && cd ~/docker-app
+nano Dockerfile
+LS
+ls
+ansible-playbook -i inventory.ini install_docker.yml
+ls -lah ~/.ssh/
+ssh -i ~/.ssh/id_rsa azureuser@20.39.40.199
+ssh -i ~/.ssh/id_rsa azureuser@172.190.167.152
+exit
